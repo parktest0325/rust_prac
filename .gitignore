@@ -1,0 +1,4 @@
+mars_calc/target
+mars_calc/Cargo.lock
+server/target
+server/Cargo.lock
