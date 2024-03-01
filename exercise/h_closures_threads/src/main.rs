@@ -32,9 +32,7 @@ fn main() {
     // join handle in a variable called `handle`. Once you've done this you should be able to run
     // the code and see the Child thread output in the middle of the main thread's letters
     //
-    let handle = thread::spawn(move || {
-        expensive_sum(my_vector)
-    });
+    let handle = thread::spawn(move || expensive_sum(my_vector));
 
     // While the child thread is running, the main thread will also do some work
     for letter in vec!["a", "b", "c", "d", "e", "f"] {
@@ -120,7 +118,7 @@ fn main() {
 
         if cnt > 5 { break }
     }
-    drop(ctx);
+    drop(ctx);   // 송신이나 수신측 어느 한쪽이 닫히면 반대편도 닫힌다. 
     handle_1.join().unwrap();
     handle_2.join().unwrap();
 
