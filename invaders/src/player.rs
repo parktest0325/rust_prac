@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::{frame::{Drawable, Frame}, shot::Shot, NUM_COLS, NUM_ROWS};
+use crate::{frame::{Drawable, Frame}, invaders::Invaders, shot::Shot, NUM_COLS, NUM_ROWS};
 
 pub struct Player {
     x: usize,
@@ -40,6 +40,19 @@ impl Player {
         }
         // 조건에 해당하는 객체만 유지한다 나머진 삭제 (죽은 shot들 삭제하는 로직)
         self.shots.retain(|shot| !shot.dead());
+    }
+
+    pub fn detect_hits(&mut self, invaders: &mut Invaders) -> bool {
+        let mut hit_something = false;
+        for shot in self.shots.iter_mut() {
+            if !shot.exploding {
+                if invaders.kill_invader_at(shot.x, shot.y) {
+                    hit_something = true;
+                    shot.explode();
+                }
+            }
+        }
+        hit_something
     }
 }
 
