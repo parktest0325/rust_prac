@@ -1,7 +1,7 @@
 use std::{error::Error, io, sync::mpsc, thread, time::Duration};
 
 use crossterm::{cursor::{Hide, Show}, event::{self, Event, KeyCode}, terminal::{self, EnterAlternateScreen, LeaveAlternateScreen}, ExecutableCommand};
-use invaders::{frame::{self, new_frame}, render};
+use invaders::{frame::{self, new_frame, Drawable}, player::Player, render};
 use rusty_audio::Audio;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -40,9 +40,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 
     // Game Loop
+    let mut player = Player::new();
     'gameloop: loop {
         // Per-frame init
-        let curr_frame = new_frame();
+        let mut curr_frame = new_frame();
 
         // Input
         while event::poll(Duration::default())? {
@@ -51,14 +52,17 @@ fn main() -> Result<(), Box<dyn Error>> {
                     KeyCode::Esc | KeyCode::Char('q') => {
                         audio.play("lose");
                         break 'gameloop;
-                    }
-                    _ => {}
+                    },
+                    KeyCode::Left => player.move_left(),
+                    KeyCode::Right => player.move_right(),
+                    _ => {},
                 }
             }
         }
 
         // Draw & render
         // 어떤 에러가 발생해도 무시한다. unwrap이나 ? 를 사용하면 에러 발생 시 종료됨 
+        player.draw(&mut curr_frame);
         let _ = render_tx.send(curr_frame);
         thread::sleep(Duration::from_millis(1));
     }
